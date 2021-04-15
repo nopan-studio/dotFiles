@@ -1,0 +1,56 @@
+#! /bin/sh
+pgrep -x sxhkd > /dev/null || sxhkd &
+sh ~/.config/bspwm/display.sh 
+my_laptop_external_monitor=$(xrandr --query | grep 'VGA1')
+if [[ $my_laptop_external_monitor = VGA1\ connected* ]]; then
+	#bspc monitor LVDS1 -d I II
+	bspc monitor VGA1 -d I II III IV
+else
+	bspc monitor LVDS1 -d I II  III IV 
+fi
+
+#colors
+bspc config normal_border_color "#1F1626"
+bspc config active_border_color "#1F1626"
+bspc config focused_border_color "#E91643"
+bspc presel_feedback_color "#F67E7D"
+
+# window configs
+bspc config left_padding   5
+bspc config right_padding  5
+bspc config top_padding    5
+bspc config bottom_padding 5
+bspc config border_width   5
+bspc config window_gap     15
+
+bspc config split_ratio          0.50
+bspc config borderless_monocle   false
+bspc config gapless_monocle      false
+bspc config focus_follows_pointer true
+
+#bspc rule -a Gimp desktop='^8' state=floating follow=on
+#bspc rule -a Chromium desktop='^2'
+#bspc rule -a mplayer2 state=floating
+#bspc rule -a Kupfer.py focus=on
+#bspc rule -a Screenkey manage=off
+#bspc rule -a tilda state=floating
+#bspc config ignore_ewmh_focus true
+
+##eeeeeeeeee
+xrandr --output VGA1 --brightness 1.1 --gamma 1.1;
+xrandr --output LVDS1 --brightness 0.8 	--gamma 0.8;
+bspc monitor VGA1 -d I II III IV
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+sleep 1
+nitrogen --restore &
+
+notify-send "killing pulseaudio"
+
+dunst &
+flameshot &
+sleep 1
+
+pkill picom ; picom -b &
+/home/nopan/.config/polybar/launch.sh --blocks &
+notify-send "EVERYTHING IS FINE YOU CAN DO YOUR THING NOW." &
+pulseaudio  --start&
